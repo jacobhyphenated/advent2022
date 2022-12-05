@@ -2,8 +2,8 @@ package com.jacobhyphenated.advent2022
 
 interface Day<T> {
     fun getInput(): T
-    fun part1(input: T): Number
-    fun part2(input: T): Number
+    fun part1(input: T): Any
+    fun part2(input: T): Any
 
     fun run() {
         val input = getInput()
