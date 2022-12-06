@@ -8,9 +8,9 @@ interface Day<T> {
     fun run() {
         val input = getInput()
         var start = System.nanoTime()
-        println("Part 1: ${part1(input)} (${(System.nanoTime() - start) / 1000000.0}ms)")
+        println("Part 1: ${part1(input)} (${(System.nanoTime() - start) / 1_000_000.0}ms)")
         start = System.nanoTime()
-        println("Part 2: ${part2(input)} (${(System.nanoTime() - start) / 1000000.0}ms)")
+        println("Part 2: ${part2(input)} (${(System.nanoTime() - start) / 1_000_000.0}ms)")
     }
 
     fun readInputFile(day: String): String {
