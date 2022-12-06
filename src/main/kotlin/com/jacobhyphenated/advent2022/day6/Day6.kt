@@ -7,6 +7,10 @@ class Day6: Day<String> {
         return readInputFile("day6")
     }
 
+    override fun warmup(input: String): Any {
+        return findUniqueMarker(input, 2)
+    }
+
     override fun part1(input: String): Number {
         return findUniqueMarker(input, 4)
     }
