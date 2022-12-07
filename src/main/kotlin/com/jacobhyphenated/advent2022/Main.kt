@@ -6,6 +6,7 @@ import com.jacobhyphenated.advent2022.day3.Day3
 import com.jacobhyphenated.advent2022.day4.Day4
 import com.jacobhyphenated.advent2022.day5.Day5
 import com.jacobhyphenated.advent2022.day6.Day6
+import com.jacobhyphenated.advent2022.day7.Day7
 import java.util.*
 
 fun main(args: Array<String>) {
@@ -15,7 +16,8 @@ fun main(args: Array<String>) {
         "day3" to Day3(),
         "day4" to Day4(),
         "day5" to Day5(),
-        "day6" to Day6()
+        "day6" to Day6(),
+        "day7" to Day7()
     )
     args.forEach { day ->
         println()
