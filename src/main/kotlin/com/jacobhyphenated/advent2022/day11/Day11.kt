@@ -112,7 +112,6 @@ data class Monkey(
                     Pair(it, ifTestFalse)
                 }
             }.also { items.clear() }
-
     }
 
     fun reduceItems(lcm: Long) {
