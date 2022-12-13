@@ -1,8 +1,16 @@
 package com.jacobhyphenated.advent2022.day12
 
 import com.jacobhyphenated.advent2022.Day
-import java.util.*
+import java.util.PriorityQueue
 
+/**
+ * Day 12: Hill Climbing Algorithm
+ *
+ * The terrain is given as a 2d map of characters. 'S' is the start position, 'E' is the end position.
+ * The characters indicate the height of the terrain with 'a' being the lowest and 'z' being the highest.
+ * You can always climb down, but you can only climb up to a position 1 higher ( b -> c but not c -> e).
+ * S is the equivalent of 'a' and E is the equivalent of 'z'.
+ */
 class Day12: Day<List<List<Char>>> {
     override fun getInput(): List<List<Char>> {
         return readInputFile("day12")
@@ -10,14 +18,22 @@ class Day12: Day<List<List<Char>>> {
             .map { it.toCharArray().asList() }
     }
 
+    /**
+     * Find the path that takes the fewest number of steps to get from S to E
+     */
     override fun part1(input: List<List<Char>>): Any {
         val startPosition = findStartPosition(input)
         return shortestPath(startPosition, input)
     }
 
+    /**
+     * In the future, we might want to create a trail.
+     * Look at all 'a' locations as possible starting points.
+     * Find the path that takes the fewest number of steps to get to E
+     */
     override fun part2(input: List<List<Char>>): Int {
         val startingPositions = input.flatMapIndexed { r, row ->
-            row.mapIndexed { index, c -> Pair(index,c) }
+            row.mapIndexed { index, row -> Pair(index, row) }
                 .filter { (_, character) -> character == 'a' }
                 .map { (c, _) -> Pair(r, c) }
         }
