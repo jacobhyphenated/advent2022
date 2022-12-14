@@ -33,7 +33,7 @@ class Day12: Day<List<List<Char>>> {
      */
     override fun part2(input: List<List<Char>>): Int {
         val startingPositions = input.flatMapIndexed { r, row ->
-            row.mapIndexed { index, row -> Pair(index, row) }
+            row.mapIndexed { index, value -> Pair(index, value) }
                 .filter { (_, character) -> character == 'a' }
                 .map { (c, _) -> Pair(r, c) }
         }

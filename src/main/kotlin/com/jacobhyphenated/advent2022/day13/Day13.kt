@@ -100,9 +100,9 @@ class Packet (
      * To check order, look from left to right in each packet
      *      If the value is a number on both, the left should be less than the right
      *      If one of the two packets has a number, convert that number to a single value list
-     *      If both are lists, go from left to right comparing each value in the list (left hand side should be smaller)
-     *      - if the left hand side runs out of values first, they are in the correct order
-     *      - if the right hand side runs out of values first, they are out of order
+     *      If both are lists, go from left to right comparing each value in the list (left-hand side should be smaller)
+     *      - if the left-hand side runs out of values first, they are in the correct order
+     *      - if the right-hand side runs out of values first, they are out of order
      */
     override fun compareTo(other: Packet): Int {
         if (this.value != null && other.value != null) {
