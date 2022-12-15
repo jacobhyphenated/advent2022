@@ -18,7 +18,7 @@ class Day14Test {
             }
         }
         val day = Day14()
-        assertEquals(24, day.part1(rocks))
+        assertEquals(24, day.part1(day.buildRockStructure(rocks)))
     }
 
     @Test
@@ -34,6 +34,6 @@ class Day14Test {
             }
         }
         val day = Day14()
-        assertEquals(93, day.part2(rocks))
+        assertEquals(93, day.part2(day.buildRockStructure(rocks)))
     }
 }

@@ -12,33 +12,30 @@ import kotlin.math.min
  *
  * Sand falls from a point at (500,0) with every increase in the y-axes being the sand dropping by 1.
  */
-class Day14: Day<List<List<Pair<Int,Int>>>> {
+class Day14: Day<Set<Pair<Int,Int>>> {
 
-    override fun getInput(): List<List<Pair<Int, Int>>> {
-        return readInputFile("day14").lines().map { line ->
+    override fun getInput(): Set<Pair<Int,Int>> {
+        val input =  readInputFile("day14").lines().map { line ->
             line.split(" -> ").map {
                 val (x,y) = it.split(",")
                 Pair(x.toInt(),y.toInt())
             }
         }
+        return buildRockStructure(input)
     }
 
     /**
-     * Sand comes to rest against where the rock formations lines form.
+     * Sand comes to rest against the rock formations lines.
      * If a piece of sand falls below the highest y value of the rock structure, it will fall forever.
      * Drop sand until one grain falls forever. How many grains of sand are dropped?
      */
-    override fun part1(input: List<List<Pair<Int, Int>>>): Int {
-        val rockStructure = buildRockStructure(input)
+    override fun part1(input: Set<Pair<Int,Int>>): Int {
+        val rockStructure = input.toMutableSet()
         val maxY = rockStructure.maxOf { (_,y) -> y }
         var sandCount = 0
-        do {
-            val sandLocation = dropSand(rockStructure, maxY)
-            sandLocation?.also {
-                sandCount++
-                rockStructure.add(it)
-            }
-        } while (sandLocation != null)
+        while(dropSand(rockStructure, maxY)?.also { rockStructure.add(it) } != null){
+            sandCount++
+        }
         return sandCount
     }
 
@@ -49,16 +46,14 @@ class Day14: Day<List<List<Pair<Int,Int>>>> {
      * Drop sand until it covers the starting drop point (500,0)
      * How many grains of sand are dropped?
      */
-    override fun part2(input: List<List<Pair<Int, Int>>>): Any {
-        val rockStructure = buildRockStructure(input)
+    override fun part2(input: Set<Pair<Int,Int>>): Int {
+        val rockStructure = input.toMutableSet()
         val maxY = rockStructure.maxOf { (_,y) -> y }
         var sandCount = 0
-        do {
-            val sandLocation = dropSandWithBottom(rockStructure, maxY + 2)
+        while (dropSandWithBottom(rockStructure, maxY + 2).also { rockStructure.add(it) } != Pair(500,0)) {
             sandCount++
-            rockStructure.add(sandLocation)
-        } while (sandLocation != Pair(500,0))
-        return sandCount
+        }
+        return sandCount + 1
     }
 
     // Use the code from part2 to solve part1
@@ -82,7 +77,7 @@ class Day14: Day<List<List<Pair<Int,Int>>>> {
         var (x,y) = Pair(500, 0)
         while (y < bottom - 1){
             val (newX, newY) = listOf(Pair(x, y+1), Pair(x-1, y+1), Pair(x+1, y+1))
-                .firstOrNull { !rockStructure.contains(it) }
+                .firstOrNull { it !in rockStructure }
                 ?: return Pair(x,y)
             x = newX
             y = newY
@@ -94,7 +89,7 @@ class Day14: Day<List<List<Pair<Int,Int>>>> {
      * Represent the rocks as a set of all points that rocks occupy.
      * Go through each line segment and add all points to a set of rock locations
      */
-    private fun buildRockStructure(input: List<List<Pair<Int,Int>>>): MutableSet<Pair<Int,Int>> {
+    fun buildRockStructure(input: List<List<Pair<Int,Int>>>): Set<Pair<Int,Int>> {
         val set = mutableSetOf<Pair<Int,Int>>()
         for (rockSegment in input) {
             rockSegment.reduce { (x1, y1), (x2, y2) ->
