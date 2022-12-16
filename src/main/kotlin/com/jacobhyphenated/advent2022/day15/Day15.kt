@@ -2,7 +2,6 @@ package com.jacobhyphenated.advent2022.day15
 
 import com.jacobhyphenated.advent2022.Day
 import kotlin.math.absoluteValue
-import kotlin.math.max
 
 /**
  * Day 15: Beacon Exclusion Zone
@@ -87,7 +86,7 @@ class Day15: Day<List<Sensor>> {
             val xDiff = if (current.first < inRangeOf.x) { (inRangeOf.x - current.first) * 2 + diff } else { diff }
 
             // if we're on the edge of the coverage area, xDiff will be 0, so always advance x by at least 1
-            x += max(xDiff, 1)
+            x += xDiff.coerceAtLeast(1)
         }
         return -1
     }
