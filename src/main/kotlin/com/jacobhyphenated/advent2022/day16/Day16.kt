@@ -3,16 +3,32 @@ package com.jacobhyphenated.advent2022.day16
 import com.jacobhyphenated.advent2022.Day
 import kotlin.math.max
 
+/**
+ * Day 16: Proboscidea Volcanium
+ *
+ * The cave system contains several different valves connected by tunnels.
+ * Each valve releases some amount of pressure per minute once it's been opened.
+ *
+ * It takes 1 minute to open a valve and 1 minute to move to an adjacent valve location.
+ */
 class Day16: Day<List<String>> {
     override fun getInput(): List<String> {
         return readInputFile("day16").lines()
     }
 
+    /**
+     * You have 30 minutes. Maximize how much pressure can be released in that time.
+     * return the total pressure released
+     */
     override fun part1(input: List<String>): Int {
         val (start, valves) = createGraph(input)
         return maximizePressure(start, null, valves, 0, 30, setOf(), mutableSetOf(500))
     }
 
+    /**
+     * You spend 4 minutes training an elephant to help you. You and the elephant move independently.
+     * return the maximum total pressure that can be released in the remaining 26 minutes.
+     */
     override fun part2(input: List<String>): Int {
         val (start, valves) = createGraph(input)
         return maximizePressureWithElephant(start, null, start, null, valves, 0, 26, setOf(), mutableSetOf(500))
@@ -36,15 +52,19 @@ class Day16: Day<List<String>> {
                                  minute: Int,
                                  open: Set<String>,
                                  solutions: MutableSet<Int>): Int {
+        // We're out of time, use the current pressure
         if (minute <= 0) {
             solutions.add(currentPressure)
             return currentPressure
         }
+        // All the valves are on. We know the pressure for this DFS path
         if (allValves.all { it.pressure == 0 || it.name in open }) {
             solutions.add(currentPressure)
             return currentPressure
         }
 
+        // If we were to magically turn all the valves on,
+        // would that added pressure be better than another solved DFS path?
         val potentialMax = currentPressure + allValves
             .filter { it.pressure > 0 && it.name !in open }
             .sumOf { it.pressure * (minute - 1) }
@@ -57,17 +77,25 @@ class Day16: Day<List<String>> {
             .let { it.ifEmpty { listOf(previousValve!!) } } // only visit the previous value if there are no other paths
 
         var bestPath = 0
+        // If we are near a valve that's not already open
+        // we can choose to spend 1 minute opening it, or move on to the next space
         if (currentValve.pressure > 0 && currentValve.name !in open) {
             val nextOpen = open.toMutableSet()
             nextOpen.add(currentValve.name)
             val nextMinute = minute - 1
             val newPressure = currentPressure + currentValve.pressure * nextMinute
+            // Evaluate the best path options if we open this valve
             bestPath = adjacent.maxOf { maximizePressure(it, currentValve, allValves, newPressure, nextMinute - 1, nextOpen, solutions) }
         }
+        // evaluate the best path options of moving to each adjacent valve
         val passThrough = adjacent.maxOf { maximizePressure(it, currentValve, allValves, currentPressure, minute - 1, open, solutions) }
         return max(bestPath, passThrough)
     }
 
+    /**
+     * Use the same plan as part 1, but also keep track of the location of
+     * the elephant that's assisting with turning the valves.
+     */
     private fun maximizePressureWithElephant(myCurrentValve: Valve,
                                              myPreviousValve: Valve?,
                                              elephantCurrentValve: Valve,
@@ -104,6 +132,7 @@ class Day16: Day<List<String>> {
         val openMyValve = myCurrentValve.pressure > 0 && myCurrentValve.name !in open
         val openElephantValve = elephantCurrentValve.name != myCurrentValve.name && elephantCurrentValve.pressure > 0 && elephantCurrentValve.name !in open
 
+        // We have a valve we can open at this space
         if (openMyValve) {
             val nextOpen = open.toMutableSet()
             nextOpen.add(myCurrentValve.name)
@@ -113,6 +142,7 @@ class Day16: Day<List<String>> {
             })
         }
 
+        // The elephant has a valve it can open at this space
         if (openElephantValve) {
             val nextOpen = open.toMutableSet()
             nextOpen.add(elephantCurrentValve.name)
@@ -122,6 +152,7 @@ class Day16: Day<List<String>> {
             })
         }
 
+        // Both we and the elephant open different valves on our current spaces
         if (openElephantValve && openMyValve) {
             val nextOpen = open.toMutableSet()
             nextOpen.add(elephantCurrentValve.name)
@@ -129,6 +160,8 @@ class Day16: Day<List<String>> {
             val newPressure = currentPressure + elephantCurrentValve.pressure * (minute - 1) + myCurrentValve.pressure * (minute - 1)
             bestPath = max(bestPath, maximizePressureWithElephant(myCurrentValve, myPreviousValve, elephantCurrentValve, elephantPreviousValve, allValves, newPressure, minute - 1, nextOpen, solutions))
         }
+
+        // Also evaluate what happens if no one opens a valve
         return max(bestPath, myAdjacent.maxOf { my ->
             elephantAdjacent.maxOf { elph ->
                 maximizePressureWithElephant(my, myCurrentValve, elph, elephantCurrentValve, allValves, currentPressure, minute - 1, open, solutions)
@@ -145,7 +178,7 @@ class Day16: Day<List<String>> {
             valves[valve.name] = valve
 
             val knownNeighbors = neighborPart.removePrefix("tunnels lead to valves ")
-                .removePrefix("tunnel leads to valve ") // This was seriously mean. Not cool AoC.
+                .removePrefix("tunnel leads to valve ") // Ugh. Not cool AoC.
                 .trim().split(", ")
                 .mapNotNull { valves[it] }
             valve.adjacent.addAll(knownNeighbors)

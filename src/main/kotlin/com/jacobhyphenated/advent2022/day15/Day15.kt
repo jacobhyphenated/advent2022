@@ -18,7 +18,7 @@ class Day15: Day<List<Sensor>> {
     }
 
     /**
-     * In the 2d grid, look at only the y axis where y == 2,000,000
+     * In the 2d grid, look at only the y-axis where y == 2,000,000
      * How many positions on this axis CANNOT contain a beacon?
      *
      * Do not count places that have beacons already.
