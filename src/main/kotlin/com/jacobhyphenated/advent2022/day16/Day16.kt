@@ -21,11 +21,7 @@ class Day16: Day<List<String>> {
      * return the total pressure released
      */
     override fun part1(input: List<String>): Int {
-        val (start, valves) = createGraph(input)
-        val closedValves = valves.filter { it.pressure > 0 }
-        val travelTimes = (closedValves + start).associate { it.name to findPathsToValves(it) }
-        val startingPositions = listOf(Pair(start.name, 30))
-        return maximizePressure(startingPositions, 0, closedValves.map { it.name }.toSet(), travelTimes, valves.associateBy { it.name }, mutableSetOf(1000))
+        return findMaximumPressureFromStart(listOf(30), input)
     }
 
     /**
@@ -33,11 +29,21 @@ class Day16: Day<List<String>> {
      * return the maximum total pressure that can be released in the remaining 26 minutes.
      */
     override fun part2(input: List<String>): Int {
+        return findMaximumPressureFromStart(listOf(26,26), input)
+    }
+
+    private fun findMaximumPressureFromStart(startingTimes: List<Int>, input: List<String>): Int {
         val (start, valves) = createGraph(input)
         val closedValves = valves.filter { it.pressure > 0 }
         val travelTimes = (closedValves + start).associate { it.name to findPathsToValves(it) }
-        val startingPositions = listOf(Pair(start.name, 26), Pair(start.name, 26))
-        return maximizePressure(startingPositions, 0, closedValves.map { it.name }.toSet(), travelTimes, valves.associateBy { it.name }, mutableSetOf(1000))
+        val startingPositions = startingTimes.map { Pair(start.name, it) }
+        return maximizePressure(destinationStack = startingPositions,
+            currentPressure = 0,
+            closedValves = closedValves.map { it.name }.toSet(),
+            travelTimes = travelTimes,
+            allValves = valves.associateBy { it.name },
+            solutions = mutableSetOf(1000)
+        )
     }
 
     /**
@@ -79,13 +85,28 @@ class Day16: Day<List<String>> {
             newPressure += updatedMinute * valve.pressure
         }
 
-        // If we were to magically turn all the valves on,
-        // would that added pressure be better than another solved DFS path?
-        val potentialMax = newPressure + allValves.values
-            .filter { it.name in updatedClosedValves }
-            .sumOf { it.pressure * updatedMinute }
-        if (potentialMax < (solutions.maxOrNull() ?: 0)) {
-            return 0
+        val remainingDestinations = destinationStack.toMutableList().apply { remove(current) }
+        val travelTimeForCurrent = travelTimes.getValue(valveName)
+
+        // As intelligently as reasonable, determine if we should prune this part of the DFS
+        // Find the next hop to a remaining valve. Pretend we turn all valves on at that time.
+        // If this hypothetical pressure is still less than a known solution, we prune.
+        // this is the most important step in runtime optimization.
+        if (updatedClosedValves.size > remainingDestinations.size) {
+            val baseline = remainingDestinations.sumOf { (node, time) -> allValves.getValue(node).pressure * (time - 1) }
+            val others = updatedClosedValves.filter { it !in remainingDestinations.map { (n,_) -> n } }
+
+            // Being more accurate than naive here is the difference from 3m runtime and 20s runtime
+            val minTimeAtOthers = updatedMinute - others.minOf { travelTimeForCurrent.getValue(it) }
+            val minTimeFromRemaining = remainingDestinations.maxByOrNull { (_,time) -> time }?.let {(node, time) ->
+                val pathDistance = travelTimes.getValue(node)
+                time - others.minOf { pathDistance.getValue(it) }
+            } ?: 0
+            val otherTimeEstimate = maxOf(minTimeAtOthers, minTimeFromRemaining)
+            val potentialMax = newPressure + baseline + others.sumOf { allValves.getValue(it).pressure * otherTimeEstimate }
+            if (potentialMax < solutions.max()) {
+                return 0
+            }
         }
 
         if (updatedClosedValves.isEmpty()) {
@@ -94,8 +115,6 @@ class Day16: Day<List<String>> {
         }
 
         // Recursive DFS to all remaining closed valves
-        val travelTimeForCurrent = travelTimes.getValue(valveName)
-        val remainingDestinations = destinationStack.toMutableList().apply { remove(current) }
         return updatedClosedValves
             .map { Pair(it, travelTimeForCurrent.getValue(it)) }
             .filter { (node, _) -> node !in remainingDestinations.map { it.first } }
@@ -109,7 +128,10 @@ class Day16: Day<List<String>> {
             ?: maximizePressure(remainingDestinations, newPressure, updatedClosedValves, travelTimes, allValves, solutions)
     }
 
-
+    /**
+     * Use Dijkstra's algorithm to create a map of the distances to all other valves
+     * @param startNode the node to measure the distances from
+     */
     private fun findPathsToValves(startNode: Valve): Map<String, Int> {
         val distances = mutableMapOf(startNode.name to 0)
         val queue = PriorityQueue<PathCost> { a, b -> a.cost - b.cost }
