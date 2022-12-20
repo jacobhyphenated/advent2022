@@ -12,12 +12,4 @@ class Day17Test {
         val wind = day.parseInput(input)
         assertEquals(3068, day.part1(wind))
     }
-
-    @Test
-    fun testPart2(){
-        val input = ">>><<><>><<<>><>>><<<>>><<<><<<>><>><<>>"
-        val day = Day17()
-        val wind = day.parseInput(input)
-        assertEquals(1514285714288, day.part2(wind))
-    }
 }
