@@ -12,6 +12,7 @@ import com.jacobhyphenated.advent2022.day17.Day17
 import com.jacobhyphenated.advent2022.day18.Day18
 import com.jacobhyphenated.advent2022.day19.Day19
 import com.jacobhyphenated.advent2022.day2.Day2
+import com.jacobhyphenated.advent2022.day20.Day20
 import com.jacobhyphenated.advent2022.day21.Day21
 import com.jacobhyphenated.advent2022.day22.Day22
 import com.jacobhyphenated.advent2022.day23.Day23
@@ -47,6 +48,7 @@ fun main(args: Array<String>) {
         "day17" to Day17(),
         "day18" to Day18(),
         "day19" to Day19(),
+        "day20" to Day20(),
         "day21" to Day21(),
         "day22" to Day22(),
         "day23" to Day23(),
