@@ -86,12 +86,12 @@ class Monkey (val name: String, var number: Long? = null, var operation: Operati
 
     /**
      * Figure out what the human needs to shout by reversing the algebra
-     * @param number equals side of the operation such that:
-     * number = monkey1.getNumber() <operation> monkey2.getNumber()
+     * @param expectedResult The equals side of the operation such that:
+     * expectedResult = monkey1.getNumber() operation monkey2.getNumber()
      */
-    fun determineHumanNumber(number: Long): Long {
+    fun determineHumanNumber(expectedResult: Long): Long {
         if (name == "humn") {
-            return number
+            return expectedResult
         }
         val op = operation!!
 
@@ -100,37 +100,37 @@ class Monkey (val name: String, var number: Long? = null, var operation: Operati
             "*" -> {
                 if (op.monkey1.containsHuman()) {
                     val otherNumber = op.monkey2.getNumber()
-                    op.monkey1.determineHumanNumber(number / otherNumber)
+                    op.monkey1.determineHumanNumber(expectedResult / otherNumber)
                 } else {
                     val otherNumber = op.monkey1.getNumber()
-                    op.monkey2.determineHumanNumber(number / otherNumber)
+                    op.monkey2.determineHumanNumber(expectedResult / otherNumber)
                 }
             }
             "/" -> {
                 if (op.monkey1.containsHuman()) {
                     val otherNumber = op.monkey2.getNumber()
-                    op.monkey1.determineHumanNumber(number * otherNumber)
+                    op.monkey1.determineHumanNumber(expectedResult * otherNumber)
                 } else {
                     val otherNumber = op.monkey1.getNumber()
-                    op.monkey2.determineHumanNumber(otherNumber / number)
+                    op.monkey2.determineHumanNumber(otherNumber / expectedResult)
                 }
             }
             "+" -> {
                 if (op.monkey1.containsHuman()) {
                     val otherNumber = op.monkey2.getNumber()
-                    op.monkey1.determineHumanNumber(number - otherNumber)
+                    op.monkey1.determineHumanNumber(expectedResult - otherNumber)
                 } else {
                     val otherNumber = op.monkey1.getNumber()
-                    op.monkey2.determineHumanNumber(number - otherNumber)
+                    op.monkey2.determineHumanNumber(expectedResult - otherNumber)
                 }
             }
             "-" -> {
                 if (op.monkey1.containsHuman()) {
                     val otherNumber = op.monkey2.getNumber()
-                    op.monkey1.determineHumanNumber(number + otherNumber)
+                    op.monkey1.determineHumanNumber(expectedResult + otherNumber)
                 } else {
                     val otherNumber = op.monkey1.getNumber()
-                    op.monkey2.determineHumanNumber((number - otherNumber) * -1)
+                    op.monkey2.determineHumanNumber((expectedResult - otherNumber) * -1)
                 }
             }
             else -> throw NotImplementedError("Invalid operator ${op.operator}")
