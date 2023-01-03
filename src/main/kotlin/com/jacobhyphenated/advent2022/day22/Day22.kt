@@ -129,6 +129,8 @@ class Day22: Day<Pair<Board, List<Instruction>>> {
          2 left <-> 5 left
          3 left <-> 5 top
          4 bottom <-> 6 right
+
+        Note: I cut out a piece of paper and folded it to figure out how these fit together
      */
     private fun findCubeWrapAround(current: Pair<Int,Int>, facing: Facing, maxR: Int, maxC: Int): Pair<Pair<Int,Int>, Facing> {
         val sideLength = 50 // hardcoded to puzzle input
