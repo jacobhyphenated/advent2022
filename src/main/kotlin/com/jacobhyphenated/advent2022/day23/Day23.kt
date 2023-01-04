@@ -25,7 +25,7 @@ class Day23: Day<List<Pair<Int,Int>>> {
      * Then looking at the grid rectangle bounded by a space where an elf occupies the edge,
      * how many open spaces with no elf are there?
      */
-    override fun part1(input: List<Pair<Int, Int>>): Any {
+    override fun part1(input: List<Pair<Int, Int>>): Int {
         var elfLocations = input.toSet()
         repeat(10){ roundNum ->
             elfLocations = doRound(elfLocations, roundNum)
@@ -45,7 +45,7 @@ class Day23: Day<List<Pair<Int,Int>>> {
      * What is the first round where no elf moves?
      * Brute force approach solves it in around 1.5 seconds
      */
-    override fun part2(input: List<Pair<Int, Int>>): Any {
+    override fun part2(input: List<Pair<Int, Int>>): Int {
         var elfLocations = input.toSet()
         var round = 0
         while (true) {
@@ -97,19 +97,18 @@ class Day23: Day<List<Pair<Int,Int>>> {
         if (openAdjacent.size == 8) { return current }
 
         // Look in each direction in the proposed order to see what space to move to
+        val checkSpace = { toMove: Pair<Int,Int>, adjacent: List<Pair<Int,Int>> ->
+            if (adjacent.any { it in elfLocations }) { null } else { toMove }
+        }
         return directions.indices.firstNotNullOfOrNull { i ->
             val index = (i + startIndex) % directions.size
             when(directions[index]) {
-                Direction.NORTH -> checkSpace(Pair(row - 1, col), (col - 1 .. col + 1).map { Pair(row-1, it) }, elfLocations)
-                Direction.SOUTH -> checkSpace(Pair(row + 1, col), (col - 1 .. col + 1).map { Pair(row+1, it) }, elfLocations)
-                Direction.WEST -> checkSpace(Pair(row, col - 1), (row - 1 .. row + 1).map { Pair(it, col-1) }, elfLocations)
-                Direction.EAST -> checkSpace(Pair(row, col + 1), (row - 1 .. row + 1).map { Pair(it, col+1) }, elfLocations)
+                Direction.NORTH -> checkSpace(Pair(row - 1, col), (col - 1 .. col + 1).map { Pair(row-1, it) })
+                Direction.SOUTH -> checkSpace(Pair(row + 1, col), (col - 1 .. col + 1).map { Pair(row+1, it) })
+                Direction.WEST -> checkSpace(Pair(row, col - 1), (row - 1 .. row + 1).map { Pair(it, col-1) })
+                Direction.EAST -> checkSpace(Pair(row, col + 1), (row - 1 .. row + 1).map { Pair(it, col+1) })
             }
         } ?: current
-    }
-
-    private fun checkSpace(toMove: Pair<Int,Int>, adjacent: List<Pair<Int,Int>>, elfLocations: Set<Pair<Int, Int>>): Pair<Int,Int>? {
-        return if (adjacent.any { it in elfLocations }) { null } else { toMove }
     }
 
     fun parseInput(input: String): List<Pair<Int,Int>> {
