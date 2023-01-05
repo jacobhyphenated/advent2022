@@ -68,13 +68,9 @@ class Day20: Day<List<Long>> {
         for (i in nodes.indices) {
             val current = nodes[i]
             val toMove = current.value
-            // With very big numbers, we can save on performance by accounting for a full loop through the list
-            // but, because the value being moved is part of the list size, the modulo math isn't perfect
-            // for each full traversal of the list, add one additional unit of movement
-            var repeats = toMove.absoluteValue / nodes.size
-            // if the full traversal repeats add enough to wrap-around again, also account for that
-            repeats %= nodes.size - 1
-            val netMoveAmount =  (toMove.absoluteValue % nodes.size).toInt() + repeats.toInt()
+            // If we move enough times to wrap around the linked list, we don't have to perform every move
+            // because one node is the moving node, the modulo is the list size - 1
+            val netMoveAmount =  (toMove.absoluteValue % (nodes.size - 1)).toInt()
             if (toMove < 0) {
                 moveLeft(current, netMoveAmount)
             } else {
