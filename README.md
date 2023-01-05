@@ -4,7 +4,7 @@
 
 
 ### What's Included?
-WIP for all 2022 problems as they are released.
+Complete solutions for both parts of all 25 days.
 ### Running the Code
 
 Clone the repository and run using the local gradle wrapper, or build a jar and run the jar via command line. You'll need to pass arguments to the run command for the day you want to run. You can run multiple days at once. 
